@@ -1,0 +1,131 @@
+#!/usr/bin/env bash
+# cognito-ops — vault operations helper
+# Usage: cognito-ops <command> [args...]
+set -uo pipefail
+
+find_vault() {
+  # 1. Check local vault
+  if [ -d "$PWD/.claude/knowledge/cognito" ]; then
+    local settings="$PWD/.claude/knowledge/cognito/settings.json"
+    if [ -f "$settings" ]; then
+      local use_local
+      use_local=$(python3 -c "import json; print(json.load(open('$settings')).get('useLocalMemory', False))" 2>/dev/null || echo "false")
+      if [ "$use_local" = "True" ] || [ "$use_local" = "true" ]; then
+        echo "$PWD/.claude/knowledge/cognito"
+        return
+      fi
+    else
+      # Directory exists without settings — treat as local
+      echo "$PWD/.claude/knowledge/cognito"
+      return
+    fi
+  fi
+  # 2. Check global vault
+  local fhash
+  fhash=$(echo -n "$PWD" | sha256sum | head -c 8)
+  local gpath="$HOME/.claude/knowledge/cognito/$(basename "$PWD")-${fhash}"
+  if [ -d "$gpath" ]; then
+    echo "$gpath"
+    return
+  fi
+  echo ""
+}
+
+P=$(find_vault)
+
+case "${1:-help}" in
+  locate)
+    [ -z "$P" ] && echo "NO_VAULT_FOUND" && exit 1
+    echo "$P"
+    ;;
+
+  wake-up|wakeup)
+    [ -z "$P" ] && echo "NO_VAULT_FOUND" && exit 1
+    echo "=== L0: Identity ==="
+    cat "$P/_identity.md" 2>/dev/null || echo "<missing>"
+    echo ""
+    echo "=== L1: Facts ==="
+    cat "$P/_facts.md" 2>/dev/null || echo "<missing>"
+    echo ""
+    echo "=== L1.5: Wisdom ==="
+    cat "$P/_wisdom.md" 2>/dev/null || echo "<missing>"
+    echo ""
+    echo "=== L2: Index ==="
+    cat "$P/_index.md" 2>/dev/null || echo "<missing>"
+    ;;
+
+  search)
+    [ -z "$P" ] && echo "NO_VAULT_FOUND" && exit 1
+    Q="${2:-}"
+    [ -z "$Q" ] && echo "Usage: cognito-ops search <query>" && exit 1
+    grep -ril "$Q" "$P/" --include="*.md" 2>/dev/null | while read -r f; do
+      echo "--- ${f#$P/} ---"
+      grep -in "$Q" "$f" | head -5
+      echo ""
+    done
+    ;;
+
+  lint)
+    [ -z "$P" ] && echo "NO_VAULT_FOUND" && exit 1
+    issues=0
+    # Required files
+    for f in _identity.md _facts.md _wisdom.md _index.md _log.md; do
+      if [ ! -f "$P/$f" ]; then
+        echo "MISSING: $f"
+        issues=$((issues+1))
+      fi
+    done
+    # Oversized files
+    while IFS= read -r f; do
+      echo "OVERSIZED: ${f#$P/} ($(du -h "$f" | cut -f1))"
+      issues=$((issues+1))
+    done < <(find "$P" -name "*.md" -not -path "*/_archive/*" -size +8k 2>/dev/null || true)
+    # Wing summaries
+    for d in "$P"/wings/*/; do
+      if [ -d "$d" ] && [ ! -f "${d}_wing.md" ]; then
+        echo "MISSING: ${d#$P/}_wing.md"
+        issues=$((issues+1))
+      fi
+    done
+    # Placeholders
+    uf=$(grep -rl "TO_BE_FILLED" "$P/" --include="*.md" 2>/dev/null | wc -l || echo "0")
+    if [ "$uf" -gt 0 ]; then
+      echo "UNFILLED: $uf files have <TO_BE_FILLED> placeholders"
+      issues=$((issues+1))
+    fi
+    # Diary consolidation
+    wisdom_date=$(grep -oP 'Updated: \K\d{4}-\d{2}-\d{2}' "$P/_wisdom.md" 2>/dev/null || echo "1970-01-01")
+    diary_count=$(find "$P/dailies/" -name "diary-*.md" -newer "$P/_wisdom.md" 2>/dev/null | wc -l || echo "0")
+    if [ "$diary_count" -gt 10 ]; then
+      echo "DIARY: $diary_count entries since last consolidation ($wisdom_date)"
+      issues=$((issues+1))
+    fi
+    # Result
+    if [ "$issues" -eq 0 ]; then
+      echo "ALL_CLEAR"
+    else
+      echo "ISSUES: $issues"
+    fi
+    ;;
+
+  status)
+    [ -z "$P" ] && echo "NO_VAULT_FOUND" && exit 1
+    echo "VAULT_PATH=$P"
+    echo "WINGS=$(find "$P/wings" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l)"
+    echo "ROOMS=$(find "$P/wings" -name "*.md" -not -name "_wing.md" 2>/dev/null | wc -l)"
+    echo "ENTITIES=$(find "$P/entities" -name "*.md" 2>/dev/null | wc -l)"
+    echo "SESSIONS=$(find "$P/sessions" -name "*.md" 2>/dev/null | wc -l)"
+    echo "DIARY_ENTRIES=$(find "$P/dailies" -name "diary-*.md" 2>/dev/null | wc -l)"
+    echo "TOTAL_SIZE=$(du -sh "$P" 2>/dev/null | cut -f1)"
+    echo "LOG_ENTRIES=$(( $(wc -l < "$P/_log.md" 2>/dev/null || echo 1) - 1 ))"
+    ;;
+
+  tree)
+    [ -z "$P" ] && echo "NO_VAULT_FOUND" && exit 1
+    find "$P" -not -path "*/_archive/*" -not -name ".*" -not -name "settings.json" | sort | sed "s|$P/||" | head -60
+    ;;
+
+  *)
+    echo "cognito-ops: locate | wake-up | search <q> | lint | status | tree"
+    ;;
+esac

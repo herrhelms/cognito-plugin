@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+# cognito-autosave — hook script for automatic memory persistence
+# Usage: cognito-autosave [--precompact]
+set -uo pipefail
+
+MODE="normal"
+[ "${1:-}" = "--precompact" ] && MODE="precompact"
+
+find_vault() {
+  # Local vault
+  if [ -d "$PWD/.claude/knowledge/cognito" ]; then
+    local settings="$PWD/.claude/knowledge/cognito/settings.json"
+    if [ -f "$settings" ]; then
+      local use_local
+      use_local=$(python3 -c "import json; print(json.load(open('$settings')).get('useLocalMemory', False))" 2>/dev/null || echo "false")
+      if [ "$use_local" = "True" ] || [ "$use_local" = "true" ]; then
+        echo "$PWD/.claude/knowledge/cognito"
+        return
+      fi
+    else
+      echo "$PWD/.claude/knowledge/cognito"
+      return
+    fi
+  fi
+  # Global vault
+  local fhash
+  fhash=$(echo -n "$PWD" | sha256sum | head -c 8)
+  local gpath="$HOME/.claude/knowledge/cognito/$(basename "$PWD")-${fhash}"
+  if [ -d "$gpath" ]; then
+    echo "$gpath"
+    return
+  fi
+  echo ""
+}
+
+VAULT=$(find_vault)
+[ -z "$VAULT" ] && exit 0
+
+COUNTER_FILE="$VAULT/.save_counter"
+INTERVAL=$(python3 -c "import json; print(json.load(open('$VAULT/settings.json')).get('autoSaveInterval', 15))" 2>/dev/null || echo "15")
+
+if [ "$MODE" = "precompact" ]; then
+  echo "COGNITO_SAVE=precompact"
+  echo "VAULT_PATH=$VAULT"
+  echo "0" > "$COUNTER_FILE"
+  exit 0
+fi
+
+COUNT=0
+[ -f "$COUNTER_FILE" ] && COUNT=$(cat "$COUNTER_FILE" 2>/dev/null || echo "0")
+COUNT=$((COUNT + 1))
+
+if [ "$COUNT" -ge "$INTERVAL" ]; then
+  echo "COGNITO_SAVE=interval"
+  echo "VAULT_PATH=$VAULT"
+  echo "0" > "$COUNTER_FILE"
+else
+  echo "$COUNT" > "$COUNTER_FILE"
+  exit 0
+fi

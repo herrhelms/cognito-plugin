@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat:*)",
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "Bash(ls:*)",
+      "Bash(wc:*)",
+      "Bash(du:*)",
+      "Bash(mkdir:*)",
+      "Bash(mv:*)",
+      "Bash(date:*)",
+      "Bash(sort:*)",
+      "Bash(head:*)",
+      "Bash(echo:*)",
+      "Bash(sha256sum:*)",
+      "Bash(basename:*)",
+      "Bash(dirname:*)",
+      "Bash(cognito-ops:*)",
+      "Bash(cognito-bootstrap:*)",
+      "Bash(cognito-autosave:*)"
+    ]
+  }
+}

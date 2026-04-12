@@ -1,0 +1,139 @@
+#!/usr/bin/env bash
+# cognito-bootstrap — create a new memory vault
+# Usage: cognito-bootstrap [--local] [project_name]
+#
+# Local:  $PWD/.claude/knowledge/cognito/
+# Global: $HOME/.claude/knowledge/cognito/<basename>-<hash>/
+set -euo pipefail
+
+USE_LOCAL=false
+PROJECT_NAME=""
+
+for arg in "$@"; do
+  case "$arg" in
+    --local) USE_LOCAL=true ;;
+    *) PROJECT_NAME="$arg" ;;
+  esac
+done
+
+[ -z "$PROJECT_NAME" ] && PROJECT_NAME=$(basename "$PWD")
+
+if [ "$USE_LOCAL" = true ]; then
+  VAULT="$PWD/.claude/knowledge/cognito"
+else
+  FOLDER_HASH=$(echo -n "$PWD" | sha256sum | head -c 8)
+  VAULT="$HOME/.claude/knowledge/cognito/$(basename "$PWD")-${FOLDER_HASH}"
+fi
+
+# Create all directories individually (no brace expansion)
+mkdir -p "$VAULT"
+mkdir -p "$VAULT/wings"
+mkdir -p "$VAULT/entities"
+mkdir -p "$VAULT/sessions"
+mkdir -p "$VAULT/dailies"
+mkdir -p "$VAULT/_archive/sessions"
+mkdir -p "$VAULT/_archive/dailies"
+
+# Settings (lives inside the vault)
+cat > "$VAULT/settings.json" << EOF
+{
+  "useLocalMemory": $USE_LOCAL,
+  "vaultVersion": "1.0.0",
+  "projectName": "$PROJECT_NAME",
+  "projectPath": "$PWD",
+  "created": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+  "autoSaveInterval": 15,
+  "sessionLogRetentionDays": 30,
+  "diaryRetentionDays": 60,
+  "wisdomConsolidationThreshold": 10
+}
+EOF
+
+# L0: Identity
+cat > "$VAULT/_identity.md" << EOF
+# Identity
+Project: $PROJECT_NAME | Role: AI dev partner | Owner: <TO_BE_FILLED>
+Stack: <TO_BE_FILLED>
+Phase: Initial setup
+EOF
+
+# L1: Facts
+cat > "$VAULT/_facts.md" << EOF
+# Critical Facts
+- **Project**: <TO_BE_FILLED — one-line description>
+- **Team**: <TO_BE_FILLED>
+- **Stack**: <TO_BE_FILLED>
+- **Current focus**: Initial setup and orientation
+EOF
+
+# L1.5: Wisdom
+cat > "$VAULT/_wisdom.md" << EOF
+# Wisdom
+Updated: $(date +%Y-%m-%d)
+
+## Working patterns
+<Will be populated from diary observations>
+
+## Codebase patterns
+<Will be populated as patterns emerge>
+
+## Self-corrections
+<Will be populated from experience>
+EOF
+
+# L2: Index
+cat > "$VAULT/_index.md" << EOF
+# Vault Index
+Updated: $(date +%Y-%m-%d)
+
+## Wings
+- **$PROJECT_NAME** (1 room): Main project wing | context
+
+## Entities
+<none yet>
+
+## Recent Sessions
+<none yet>
+EOF
+
+# Changelog
+cat > "$VAULT/_log.md" << EOF
+# Changelog
+$(date +%Y-%m-%d) | BOOTSTRAP | Vault created for: $PROJECT_NAME
+EOF
+
+# Default wing
+WING_DIR="$VAULT/wings/$PROJECT_NAME"
+mkdir -p "$WING_DIR"
+
+cat > "$WING_DIR/_wing.md" << EOF
+# Wing: $PROJECT_NAME
+
+## Overview
+<TO_BE_FILLED — project description, stack, deployment>
+
+## Room Map
+| Room | Focus | Last updated |
+|---|---|---|
+| context | Requirements, goals, constraints | $(date +%Y-%m-%d) |
+
+## Tunnels
+<none yet>
+EOF
+
+cat > "$WING_DIR/context.md" << EOF
+# Context: $PROJECT_NAME
+
+## Project Goals
+<TO_BE_FILLED>
+
+## Constraints
+<TO_BE_FILLED>
+
+## User Preferences
+<TO_BE_FILLED>
+EOF
+
+echo "VAULT_PATH=$VAULT"
+echo "SETTINGS_PATH=$VAULT/settings.json"
+echo "STATUS=created"
