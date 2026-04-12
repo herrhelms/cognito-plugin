@@ -31,7 +31,7 @@ fi
 ## Step 2: If no vault exists → bootstrap
 
 Run `cognito-bootstrap` (from plugin bin/) or `cognito-bootstrap --local`
-if `useLocalMemory` is desired. Then ask the user:
+if `useCognito` is desired. Then ask the user:
 - "What's this project about?" → fill `_identity.md` + first wing
 - "Who's on the team?" → create entity pages
 - "Key decisions already made?" → populate `decisions.md`
