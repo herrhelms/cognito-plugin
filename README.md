@@ -42,14 +42,14 @@ The diary system — Claude's personal observation journal that consolidates int
 ### Option A: Local development (quick start)
 
 ```bash
-git clone https://github.com/herrhelms/cognito.git
+git clone https://github.com/herrhelms/cognito-plugin.git
 claude --plugin-dir ./cognito
 ```
 
 ### Option B: Persistent install
 
 ```bash
-git clone https://github.com/herrhelms/cognito.git ~/cognito
+git clone https://github.com/herrhelms/cognito-plugin.git ~/cognito
 claude plugin install --path ~/cognito
 ```
 
