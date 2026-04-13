@@ -283,12 +283,12 @@ This is the difference between a tool that remembers what you said and one that 
 
 ## Storage modes
 
-| `useLocalMemory` | Vault location | Use case |
+| `localCognito` | Vault location | Use case |
 |-------------------|-----------------|----------|
 | `true` | `.claude/knowledge/cognito/` | Project-local, git-committable, shared with team |
 | `false` (default) | `~/.claude/knowledge/cognito/<folder>-<hash>/` | Global, per-project isolation, private |
 
-To switch modes, set `useLocalMemory` in the vault's `settings.json` (inside the cognito directory), or tell Claude "use local memory" during bootstrap. Run `cognito-bootstrap --local` to explicitly create a project-local vault.
+To switch modes, set `localCognito` in the vault's `settings.json` (inside the cognito directory), or tell Claude "use local memory" during bootstrap. Run `cognito-bootstrap --local` to explicitly create a project-local vault.
 
 For local mode, consider this `.gitignore` to keep personal content out of version control while sharing project knowledge:
 

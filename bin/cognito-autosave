@@ -12,7 +12,7 @@ find_vault() {
     local settings="$PWD/.claude/knowledge/cognito/settings.json"
     if [ -f "$settings" ]; then
       local use_local
-      use_local=$(python3 -c "import json; print(json.load(open('$settings')).get('useLocalMemory', False))" 2>/dev/null || echo "false")
+      use_local=$(python3 -c "import json; print(json.load(open('$settings')).get('localCognito', False))" 2>/dev/null || echo "false")
       if [ "$use_local" = "True" ] || [ "$use_local" = "true" ]; then
         echo "$PWD/.claude/knowledge/cognito"
         return
