@@ -1,0 +1,15 @@
+{
+  "name": "cognito-marketplace",
+  "owner": {
+    "name": "herrhelms <helms@straw.io>"
+  },
+  "description": "Persistent structured memory for Claude Code",
+  "plugins": [
+    {
+      "name": "cognito-plugin",
+      "source": ".",
+      "description": "Persistent structured memory — gives Claude a local knowledge vault with wings, rooms, diary, and auto-save hooks that survives across sessions.",
+      "version": "0.0.1"
+    }
+  ]
+}
