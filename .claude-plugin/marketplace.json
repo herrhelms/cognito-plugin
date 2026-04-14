@@ -7,7 +7,10 @@
   "plugins": [
     {
       "name": "cognito-plugin",
-      "source": ".",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/herrhelms/cognito-plugin.git"
+      },
       "description": "Persistent structured memory — gives Claude a local knowledge vault with wings, rooms, diary, and auto-save hooks that survives across sessions.",
       "version": "0.0.1"
     }
