@@ -1,5 +1,5 @@
 {
-  "name": "cognito",
+  "name": "cognito-plugin",
   "description": "Persistent structured memory system for Claude — stores decisions, context, tasks, architecture, and working patterns across sessions as compiled markdown files on disk. Includes auto-save hooks, diary for long-term wisdom, and slash commands for memory operations.",
   "version": "0.0.1",
   "author": {
