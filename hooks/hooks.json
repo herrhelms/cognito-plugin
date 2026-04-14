@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cognito-autosave"
+            "command": "${CLAUDE_PLUGIN_ROOT}/bin/cognito-autosave"
           }
         ]
       }
@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cognito-autosave --precompact"
+            "command": "${CLAUDE_PLUGIN_ROOT}/bin/cognito-autosave --precompact"
           }
         ]
       }

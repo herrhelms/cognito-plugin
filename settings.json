@@ -16,9 +16,15 @@
       "Bash(sha256sum:*)",
       "Bash(basename:*)",
       "Bash(dirname:*)",
-      "Bash(cognito-ops:*)",
-      "Bash(cognito-bootstrap:*)",
-      "Bash(cognito-autosave:*)"
+      "Bash(${CLAUDE_PLUGIN_ROOT}/bin/cognito-autosave:*)",
+      "Bash(${CLAUDE_PLUGIN_ROOT}/bin/cognito-ops:*)",
+      "Bash(${CLAUDE_PLUGIN_ROOT}/bin/cognito-bootstrap:*)",
+      "Write(.claude/knowledge/cognito/**)",
+      "Edit(.claude/knowledge/cognito/**)",
+      "Read(.claude/knowledge/cognito/**)",
+      "Write(~/.claude/knowledge/cognito/**)",
+      "Edit(~/.claude/knowledge/cognito/**)",
+      "Read(~/.claude/knowledge/cognito/**)" 
     ]
   }
 }
