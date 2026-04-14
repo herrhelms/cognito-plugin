@@ -37,7 +37,7 @@ mkdir -p "$VAULT/_archive/dailies"
 # Settings (lives inside the vault)
 cat > "$VAULT/settings.json" << EOF
 {
-  "useCognito": $USE_LOCAL,
+  "localCognito": $USE_LOCAL,
   "vaultVersion": "1.0.0",
   "projectName": "$PROJECT_NAME",
   "projectPath": "$PWD",
