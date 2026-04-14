@@ -1,5 +1,5 @@
 ---
-name: wake
+name: co:wake
 description: >
   Load persistent memory context at session start. This skill auto-triggers
   when a session begins or when Claude needs project context. It reads the

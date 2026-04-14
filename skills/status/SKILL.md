@@ -1,5 +1,5 @@
 ---
-name: status
+name: co:status
 description: >
   Show vault status, statistics, and health overview. Use when the user
   asks about memory state, what Claude knows, or vault health.

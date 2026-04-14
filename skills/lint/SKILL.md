@@ -1,5 +1,5 @@
 ---
-name: lint
+name: co:lint
 description: >
   Audit and maintain vault health. Checks for stale facts, contradictions,
   oversized rooms, index drift, unfilled placeholders, and diary consolidation.

@@ -1,5 +1,5 @@
 ---
-name: diary
+name: co:diary
 description: >
   Claude's personal diary for process observations, working patterns, and
   meta-insights that don't fit in any wing room. Use proactively when you

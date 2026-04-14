@@ -1,5 +1,5 @@
 ---
-name: recall
+name: co:recall
 description: >
   Search and retrieve knowledge from the memory vault. Use when Claude
   needs to find past decisions, context, architecture details, or any

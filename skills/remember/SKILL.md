@@ -1,5 +1,5 @@
 ---
-name: remember
+name: co:remember
 description: >
   Persist knowledge to the memory vault. Use when Claude learns something
   worth keeping: decisions, architecture changes, task updates, problems,
